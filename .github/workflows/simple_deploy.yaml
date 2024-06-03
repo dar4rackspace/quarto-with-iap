@@ -1,0 +1,31 @@
+name: Push to GCR GitHub Action
+on: [push]
+jobs:
+  build-and-push-to-gcr-service-account:
+    runs-on: ubuntu-latest
+    steps:      
+      - uses: actions/checkout@v4
+      
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCLOUD_SERVICE_KEY }}'
+          service_account: 'artifact-registry-on-github@rax-enterprisebi-dev.iam.gserviceaccount.com'
+            
+      - name: 'Deploy to App Engine'
+        id: 'deploy'
+        uses: 'google-github-actions/deploy-appengine@v2'
+        with: 
+          project_id: rax-enterprisebi-dev
+          version: 1
+          promote: true
+      # Example of using the output
+      - id: 'test'
+        run: 'curl "${{ steps.deploy.outputs.version_url }}"'

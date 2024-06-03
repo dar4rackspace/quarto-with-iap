@@ -1,5 +1,5 @@
-runtime: python311
-
+runtime: python312
+service: quarto-prerendered-demo
 handlers:
 - url: /
   static_files: _site/index.html
